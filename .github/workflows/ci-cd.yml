@@ -30,10 +30,10 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore .NET dependencies
-      run: dotnet restore OrderAppDemo.Server/OrderAppDemo.Server.csproj
+      run: dotnet restore OrderAppDemo.Server.csproj
 
     - name: Publish API
-      run: dotnet publish OrderAppDemo.Server/OrderAppDemo.Server.csproj -c Release -o publish
+      run: dotnet publish OrderAppDemo.Server.csproj -c Release -o publish
 
     # Deploy to Azure App Service
     - name: Deploy to Azure
