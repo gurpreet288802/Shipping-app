@@ -9,36 +9,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    # Build Angular
-    - name: Setup Node
+    # Build Angular frontend
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
 
     - name: Build Angular
-      working-directory: OrderAppDemo.Server/ClientApp
+      working-directory: ClientApp
       run: |
         npm install
         npm run build --prod
 
-    # Build .NET API
+    # Setup .NET SDK
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
+    # Restore and publish .NET backend
     - name: Restore .NET dependencies
       run: dotnet restore OrderAppDemo.Server.csproj
 
-    - name: Publish API
+    - name: Publish .NET backend
       run: dotnet publish OrderAppDemo.Server.csproj -c Release -o publish
 
     # Deploy to Azure App Service
     - name: Deploy to Azure
       uses: azure/webapps-deploy@v2
       with:
-        app-name: "saorder"
+        app-name: "<your-app-service-name>"
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: publish
