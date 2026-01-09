@@ -1,0 +1,63 @@
+﻿name: CI/CD Angular + .NET Core to Azure App Service
+
+on:
+  push:
+    branches:
+      - main  # triggers deployment on push to main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      # 3️⃣ Install Angular dependencies
+      - name: Install Angular dependencies
+        working-directory: ./ClientApp
+        run: npm install
+
+      # 4️⃣ Build Angular for production
+      - name: Build Angular app
+        working-directory: ./ClientApp
+        run: npm run build -- --prod
+
+      # 5️⃣ Setup .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      # 6️⃣ Restore .NET dependencies
+      - name: Restore .NET dependencies
+        run: dotnet restore ./OrderAppDemo.Server/OrderAppDemo.Server.csproj
+
+      # 7️⃣ Build .NET Core
+      - name: Build .NET app
+        run: dotnet build ./OrderAppDemo.Server/OrderAppDemo.Server.csproj --configuration Release --no-restore
+
+      # 8️⃣ Publish .NET Core app
+      - name: Publish .NET app
+        run: dotnet publish ./OrderAppDemo.Server/OrderAppDemo.Server.csproj -c Release -o publish
+
+      # 9️⃣ Copy Angular build to wwwroot
+      - name: Copy Angular build
+        run: |
+          rm -rf ./OrderAppDemo.Server/wwwroot/*
+          cp -r ./ClientApp/dist/* ./OrderAppDemo.Server/wwwroot/
+
+      # 🔟 Deploy to Azure
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'saorder' 
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./OrderAppDemo.Server/publish
