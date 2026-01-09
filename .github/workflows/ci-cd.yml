@@ -28,7 +28,7 @@ jobs:
       # 4️⃣ Build Angular for production
       - name: Build Angular app
         working-directory: ./ClientApp
-        run: npm run build -- --prod
+        run: npm run build --prod
 
       # 5️⃣ Setup .NET
       - name: Setup .NET
