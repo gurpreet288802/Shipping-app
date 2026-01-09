@@ -42,9 +42,6 @@
 	<ItemGroup>
 	  <None Include=".github\workflows\ci-cd.yml" />
 	</ItemGroup>
-	<ItemGroup>
-		<Content Include="ClientApp/dist\**" CopyToPublishDirectory="PreserveNewest" />
-	</ItemGroup>
-	
+ 
 
 </Project>
